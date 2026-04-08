@@ -1,6 +1,6 @@
 import { create } from 'zustand'
-import type { AddressEntry, SearchState } from '../types'
-import { MIN_ADDRESSES } from '../constants'
+import type { AddressEntry, LatLng, SearchState } from '../types'
+import { MIN_ADDRESSES, MAX_ADDRESSES } from '../constants'
 
 function makeBlankEntry(id: string): AddressEntry {
   return { id, raw: '', geocoded: null }
@@ -12,6 +12,7 @@ interface AppStore {
   addAddress: () => void
   removeAddress: (id: string) => void
   updateAddress: (id: string, raw: string, geocoded?: { lat: number; lng: number } | null, placeId?: string) => void
+  hydrateAddresses: (entries: { raw: string; geocoded: LatLng; placeId?: string }[]) => void
 
   // Search results
   searchState: SearchState
@@ -64,6 +65,21 @@ export const useAppStore = create<AppStore>((set) => ({
           : a
       ),
     })),
+
+  hydrateAddresses: (entries) => {
+    const capped = entries.slice(0, MAX_ADDRESSES)
+    const hydrated: AddressEntry[] = capped.map((e) => ({
+      id: nextId(),
+      raw: e.raw,
+      geocoded: e.geocoded,
+      placeId: e.placeId,
+    }))
+    // Pad up to MIN_ADDRESSES with blanks if needed
+    while (hydrated.length < MIN_ADDRESSES) {
+      hydrated.push(makeBlankEntry(nextId()))
+    }
+    set({ addresses: hydrated })
+  },
 
   searchState: initialSearchState,
   setSearchState: (update) =>

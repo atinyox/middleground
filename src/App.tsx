@@ -6,7 +6,9 @@ import { AddressPanel } from './components/AddressPanel/AddressPanel'
 import { MapView } from './components/MapView/MapView'
 import { ResultsPanel } from './components/ResultsPanel/ResultsPanel'
 import { SearchButton } from './components/Controls/SearchButton'
+import { ShareButton } from './components/Controls/ShareButton'
 import { ErrorBanner } from './components/common/ErrorBanner'
+import { useHydrateFromUrl } from './hooks/useShareUrl'
 
 const LIBRARIES: ('places')[] = ['places']
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -24,6 +26,7 @@ function AppInner() {
 
   const searchState = useAppStore((s) => s.searchState)
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  useHydrateFromUrl()
 
   if (loadError) {
     return (
@@ -77,8 +80,9 @@ function AppInner() {
           <AddressPanel isLoaded={isLoaded} />
         </div>
 
-        <div className="px-4 pb-4 border-b border-gray-100">
+        <div className="px-4 pb-4 border-b border-gray-100 flex flex-col gap-2">
           <SearchButton />
+          <ShareButton />
         </div>
 
         {searchState.status === 'error' && searchState.error && (
