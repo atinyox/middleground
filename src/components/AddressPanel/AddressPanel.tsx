@@ -1,7 +1,11 @@
 import { useAppStore, selectCanAdd } from '../../store/appStore'
 import { AddressInput } from './AddressInput'
 
-export function AddressPanel() {
+interface Props {
+  isLoaded: boolean
+}
+
+export function AddressPanel({ isLoaded }: Props) {
   const { addresses, addAddress } = useAppStore()
   const canAdd = useAppStore(selectCanAdd)
 
@@ -12,7 +16,7 @@ export function AddressPanel() {
       </h2>
       <div className="space-y-2">
         {addresses.map((entry, i) => (
-          <AddressInput key={entry.id} entry={entry} index={i} />
+          <AddressInput key={entry.id} entry={entry} index={i} isLoaded={isLoaded} />
         ))}
       </div>
       {canAdd && (

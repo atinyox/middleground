@@ -1,4 +1,4 @@
-import { Marker } from 'react-map-gl/mapbox'
+import { Marker } from '@react-google-maps/api'
 import type { LatLng } from '../../types'
 
 interface Props {
@@ -8,13 +8,17 @@ interface Props {
 
 export function AddressMarker({ position, label }: Props) {
   return (
-    <Marker latitude={position.lat} longitude={position.lng} anchor="center">
-      <div
-        className="flex h-7 w-7 items-center justify-center rounded-full bg-blue-500 text-white text-xs font-bold shadow-md ring-2 ring-white"
-        title={`Address ${label}`}
-      >
-        {label}
-      </div>
-    </Marker>
+    <Marker
+      position={position}
+      label={{ text: label, color: 'white', fontWeight: 'bold', fontSize: '12px' }}
+      icon={{
+        path: google.maps.SymbolPath.CIRCLE,
+        scale: 14,
+        fillColor: '#3B82F6',
+        fillOpacity: 1,
+        strokeColor: 'white',
+        strokeWeight: 2,
+      }}
+    />
   )
 }

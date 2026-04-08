@@ -1,77 +1,6 @@
 import type { LatLng, PlaceResult } from '../types'
 import { RADIUS_STEPS } from '../constants'
 
-const SEARCH_BASE = 'https://api.mapbox.com/search/searchbox/v1/category'
-
-// Mapbox Search Box category canonical names
-const CAT_RESTAURANT = 'restaurant'
-const CAT_SHOPPING_MALL = 'shopping_mall'
-
-interface MbxFeature {
-  type: 'Feature'
-  geometry: { type: 'Point'; coordinates: [number, number] }
-  properties: {
-    mapbox_id: string
-    name: string
-    full_address?: string
-    place_formatted?: string
-    poi_category?: string[]
-  }
-}
-
-interface MbxCategoryResponse {
-  features: MbxFeature[]
-}
-
-/** Convert a center + radius (meters) to a bbox string for Mapbox. */
-function radiusToBbox(center: LatLng, radiusM: number): string {
-  const latDelta = radiusM / 111_320
-  const lngDelta = radiusM / (111_320 * Math.cos((center.lat * Math.PI) / 180))
-  return [
-    center.lng - lngDelta,
-    center.lat - latDelta,
-    center.lng + lngDelta,
-    center.lat + latDelta,
-  ]
-    .map((v) => v.toFixed(6))
-    .join(',')
-}
-
-function mapFeature(f: MbxFeature): PlaceResult {
-  const [lng, lat] = f.geometry.coordinates
-  return {
-    placeId: f.properties.mapbox_id,
-    name: f.properties.name,
-    address: f.properties.full_address ?? f.properties.place_formatted ?? '',
-    location: { lat, lng },
-    types: f.properties.poi_category ?? [],
-  }
-}
-
-async function categorySearch(
-  token: string,
-  midpoint: LatLng,
-  radiusM: number,
-  category: string
-): Promise<PlaceResult[]> {
-  const params = new URLSearchParams({
-    access_token: token,
-    proximity: `${midpoint.lng},${midpoint.lat}`,
-    bbox: radiusToBbox(midpoint, radiusM),
-    limit: '10',   // Mapbox Search Box API maximum is 10
-    language: 'en',
-  })
-
-  const res = await fetch(`${SEARCH_BASE}/${category}?${params}`)
-  if (!res.ok) {
-    const body = await res.text().catch(() => '')
-    throw new Error(`Mapbox Search API error: ${res.status} ${res.statusText}${body ? ` — ${body}` : ''}`)
-  }
-
-  const data = (await res.json()) as MbxCategoryResponse
-  return data.features.map(mapFeature)
-}
-
 export interface FallbackResult {
   places: PlaceResult[]
   searchRadius: number
@@ -79,23 +8,57 @@ export interface FallbackResult {
   fallbackType?: 'radius' | 'shopping_mall'
 }
 
+function mapPlaceResult(
+  result: google.maps.places.PlaceResult
+): PlaceResult | null {
+  const location = result.geometry?.location
+  if (!location || !result.place_id || !result.name) return null
+
+  return {
+    placeId: result.place_id,
+    name: result.name,
+    address: result.vicinity ?? '',
+    location: { lat: location.lat(), lng: location.lng() },
+    rating: result.rating,
+    userRatingsTotal: result.user_ratings_total,
+    priceLevel: result.price_level,
+    types: result.types ?? [],
+    photoRef: result.photos?.[0]?.getUrl({ maxWidth: 400 }),
+  }
+}
+
+function nearbySearch(
+  service: google.maps.places.PlacesService,
+  request: google.maps.places.PlaceSearchRequest
+): Promise<google.maps.places.PlaceResult[]> {
+  return new Promise((resolve, reject) => {
+    service.nearbySearch(request, (results, status) => {
+      if (status === google.maps.places.PlacesServiceStatus.OK && results) {
+        resolve(results)
+      } else if (status === google.maps.places.PlacesServiceStatus.ZERO_RESULTS) {
+        resolve([])
+      } else {
+        reject(new Error(`Places API error: ${status}`))
+      }
+    })
+  })
+}
+
 /**
- * Search for restaurants near the midpoint using Mapbox Search Box API,
+ * Search for restaurants near the midpoint using Google Places Nearby Search,
  * expanding radius if needed, falling back to shopping malls.
  */
 export async function searchWithFallback(
-  mapboxToken: string,
+  service: google.maps.places.PlacesService,
   midpoint: LatLng
 ): Promise<FallbackResult> {
-  for (const radius of RADIUS_STEPS) {
-    const places = await categorySearch(
-      mapboxToken,
-      midpoint,
-      radius,
-      CAT_RESTAURANT
-    )
+  const location = new google.maps.LatLng(midpoint.lat, midpoint.lng)
 
-    if (places.length > 0) {
+  for (const radius of RADIUS_STEPS) {
+    const raw = await nearbySearch(service, { location, radius, type: 'restaurant' })
+
+    if (raw.length > 0) {
+      const places = raw.map(mapPlaceResult).filter(Boolean) as PlaceResult[]
       return {
         places,
         searchRadius: radius,
@@ -106,13 +69,13 @@ export async function searchWithFallback(
   }
 
   // All restaurant radii exhausted — try shopping malls
-  const places = await categorySearch(
-    mapboxToken,
-    midpoint,
-    RADIUS_STEPS[RADIUS_STEPS.length - 1],
-    CAT_SHOPPING_MALL
-  )
+  const raw = await nearbySearch(service, {
+    location,
+    radius: RADIUS_STEPS[RADIUS_STEPS.length - 1],
+    type: 'shopping_mall',
+  })
 
+  const places = raw.map(mapPlaceResult).filter(Boolean) as PlaceResult[]
   return {
     places,
     searchRadius: RADIUS_STEPS[RADIUS_STEPS.length - 1],

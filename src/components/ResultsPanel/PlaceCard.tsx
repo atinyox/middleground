@@ -33,14 +33,21 @@ export function PlaceCard({ place }: Props) {
   const handleClick = () => {
     setSelectedPlaceId(isSelected ? null : place.placeId)
     if (mapRef) {
-      mapRef.flyTo({ center: [place.location.lng, place.location.lat], zoom: RESULT_MAP_ZOOM, duration: 600 })
+      mapRef.panTo(place.location)
+      mapRef.setZoom(RESULT_MAP_ZOOM)
     }
   }
 
+  const mapsUrl = `https://www.google.com/maps/place/?q=place_id:${place.placeId}`
+  const yelpUrl = `https://www.yelp.com/search?find_desc=${encodeURIComponent(place.name)}&find_loc=${encodeURIComponent(place.address)}`
+
   return (
-    <button
+    <div
+      role="button"
+      tabIndex={0}
       onClick={handleClick}
-      className={`w-full text-left rounded-lg border p-3 transition-all
+      onKeyDown={(e) => e.key === 'Enter' && handleClick()}
+      className={`w-full text-left rounded-lg border p-3 transition-all cursor-pointer
         ${isSelected
           ? 'border-blue-400 bg-blue-50 shadow-sm'
           : 'border-gray-200 bg-white hover:border-gray-300 hover:shadow-sm'
@@ -78,8 +85,28 @@ export function PlaceCard({ place }: Props) {
               </span>
             )}
           </div>
+          <div className="flex gap-2 mt-1.5">
+            <a
+              href={mapsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-blue-600 hover:underline"
+            >
+              Maps
+            </a>
+            <a
+              href={yelpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+              className="text-xs text-red-500 hover:underline"
+            >
+              Yelp
+            </a>
+          </div>
         </div>
       </div>
-    </button>
+    </div>
   )
 }

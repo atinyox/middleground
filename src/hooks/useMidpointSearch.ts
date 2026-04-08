@@ -1,12 +1,18 @@
-import { useCallback } from 'react'
+import { useCallback, useRef } from 'react'
 import { useAppStore } from '../store/appStore'
 import { computeGeographicMidpoint } from '../utils/geo'
 import { searchWithFallback } from '../utils/places'
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
-
 export function useMidpointSearch() {
-  const { addresses, setSearchState } = useAppStore()
+  const { addresses, setSearchState, mapRef } = useAppStore()
+  const serviceRef = useRef<google.maps.places.PlacesService | null>(null)
+
+  const getService = useCallback(() => {
+    if (!serviceRef.current && mapRef) {
+      serviceRef.current = new google.maps.places.PlacesService(mapRef)
+    }
+    return serviceRef.current
+  }, [mapRef])
 
   const runSearch = useCallback(async () => {
     const geocoded = addresses
@@ -18,6 +24,12 @@ export function useMidpointSearch() {
       return
     }
 
+    const service = getService()
+    if (!service) {
+      setSearchState({ status: 'error', error: 'Map not ready. Please try again.' })
+      return
+    }
+
     setSearchState({ status: 'computing', error: undefined })
 
     const midpoint = computeGeographicMidpoint(geocoded)
@@ -25,7 +37,7 @@ export function useMidpointSearch() {
     setSearchState({ status: 'searching', geographicMidpoint: midpoint })
 
     try {
-      const result = await searchWithFallback(MAPBOX_TOKEN, midpoint)
+      const result = await searchWithFallback(service, midpoint)
       setSearchState({
         status: 'done',
         places: result.places,
@@ -39,7 +51,7 @@ export function useMidpointSearch() {
         error: err instanceof Error ? err.message : 'Search failed.',
       })
     }
-  }, [addresses, setSearchState])
+  }, [addresses, getService, setSearchState])
 
   return { runSearch }
 }

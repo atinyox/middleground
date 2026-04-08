@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import type { AddressEntry, SearchState } from '../types'
-import type { MapRef } from 'react-map-gl/mapbox'
 import { MIN_ADDRESSES } from '../constants'
 
 function makeBlankEntry(id: string): AddressEntry {
@@ -23,9 +22,9 @@ interface AppStore {
   selectedPlaceId: string | null
   setSelectedPlaceId: (id: string | null) => void
 
-  // Map instance (for flyTo, fitBounds)
-  mapRef: MapRef | null
-  setMapRef: (map: MapRef) => void
+  // Map instance (for panTo, fitBounds)
+  mapRef: google.maps.Map | null
+  setMapRef: (map: google.maps.Map) => void
 }
 
 const initialSearchState: SearchState = {
