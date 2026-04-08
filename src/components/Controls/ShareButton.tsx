@@ -15,7 +15,10 @@ export function ShareButton() {
     const params = new URL(url).search
     window.history.replaceState({}, '', params)
 
-    if (navigator.share) {
+    const uaData = (navigator as Navigator & { userAgentData?: { mobile?: boolean } }).userAgentData
+    const isMobile = uaData?.mobile ?? /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)
+
+    if (navigator.share && isMobile) {
       try {
         await navigator.share({ title: 'Middleground', url })
       } catch {
