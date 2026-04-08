@@ -68,10 +68,10 @@ function AppInner() {
         <div className="px-4 py-4 border-b border-gray-100 flex items-start justify-between">
           <div>
             <h1 className="text-lg font-bold text-gray-900 tracking-tight">
-              Middleground
+              LetsEatHere
             </h1>
             <p className="text-xs text-gray-500 mt-0.5">
-              Find the perfect midpoint for your group
+              a locationally weighted average
             </p>
           </div>
           {/* Close button — mobile only */}

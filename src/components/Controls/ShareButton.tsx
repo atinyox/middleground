@@ -20,7 +20,7 @@ export function ShareButton() {
 
     if (navigator.share && isMobile) {
       try {
-        await navigator.share({ title: 'Middleground', url })
+        await navigator.share({ title: 'LetsEatHere', url })
       } catch {
         // User dismissed — not an error worth surfacing
       }
