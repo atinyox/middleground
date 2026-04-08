@@ -1,0 +1,63 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#1e3a5f"/>
+      <stop offset="100%" stop-color="#0f172a"/>
+    </radialGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Subtle dot grid -->
+  <pattern id="dots" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+    <circle cx="1" cy="1" r="1" fill="#334155" opacity="0.6"/>
+  </pattern>
+  <rect width="1200" height="630" fill="url(#dots)"/>
+
+  <!-- Connecting line between pins -->
+  <line x1="390" y1="230" x2="600" y2="290" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
+  <line x1="810" y1="230" x2="600" y2="290" stroke="#3b82f6" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
+
+  <!-- Left pin -->
+  <g transform="translate(390, 180)">
+    <ellipse cx="0" cy="56" rx="10" ry="4" fill="#000" opacity="0.3"/>
+    <path d="M0 0 C-22 0 -22 33 0 33 C22 33 22 0 0 0Z" fill="#3b82f6"/>
+    <path d="M0 33 L0 54" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="0" cy="13" r="7" fill="white" opacity="0.9"/>
+  </g>
+
+  <!-- Right pin -->
+  <g transform="translate(810, 180)">
+    <ellipse cx="0" cy="56" rx="10" ry="4" fill="#000" opacity="0.3"/>
+    <path d="M0 0 C-22 0 -22 33 0 33 C22 33 22 0 0 0Z" fill="#3b82f6"/>
+    <path d="M0 33 L0 54" stroke="#3b82f6" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="0" cy="13" r="7" fill="white" opacity="0.9"/>
+  </g>
+
+  <!-- Midpoint diamond -->
+  <g transform="translate(600, 270)" filter="url(#glow)">
+    <ellipse cx="0" cy="48" rx="12" ry="5" fill="#000" opacity="0.3"/>
+    <rect x="-18" y="-18" width="36" height="36" rx="4" fill="#f59e0b" transform="rotate(45)"/>
+    <rect x="-10" y="-10" width="20" height="20" rx="2" fill="#fbbf24" transform="rotate(45)"/>
+  </g>
+
+  <!-- Title -->
+  <text x="600" y="420" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="72" font-weight="700" fill="white" text-anchor="middle" letter-spacing="-1">
+    Middleground
+  </text>
+
+  <!-- Subtitle -->
+  <text x="600" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif"
+        font-size="28" font-weight="400" fill="#94a3b8" text-anchor="middle" letter-spacing="0.5">
+    Find the perfect meeting spot for your group
+  </text>
+
+  <!-- Bottom accent line -->
+  <rect x="540" y="510" width="120" height="3" rx="2" fill="#3b82f6" opacity="0.7"/>
+</svg>
