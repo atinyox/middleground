@@ -1,5 +1,4 @@
 import type { LatLng } from '../types'
-import { GRID_RADIUS_KM, MIDPOINT_DIFF_THRESHOLD } from '../constants'
 
 /**
  * Compute the geographic midpoint using ECEF (3D Cartesian) averaging.
@@ -49,39 +48,6 @@ export function haversineDistance(a: LatLng, b: LatLng): number {
     Math.cos(φ1) * Math.cos(φ2) * sinHalfLng * sinHalfLng
 
   return R * 2 * Math.atan2(Math.sqrt(aVal), Math.sqrt(1 - aVal))
-}
-
-/**
- * Returns true if the two midpoints differ by more than MIDPOINT_DIFF_THRESHOLD meters.
- */
-export function midpointDiffersMeaningfully(a: LatLng, b: LatLng): boolean {
-  return haversineDistance(a, b) > MIDPOINT_DIFF_THRESHOLD
-}
-
-/**
- * Generate a uniform (2*steps+1)² grid of candidate points around a center.
- * With steps=4, produces 81 candidates within radiusKm of center.
- */
-export function generateCandidateGrid(
-  center: LatLng,
-  radiusKm: number = GRID_RADIUS_KM,
-  steps: number = 4
-): LatLng[] {
-  const candidates: LatLng[] = []
-  const latPerKm = 1 / 111.32
-  const lngPerKm = 1 / (111.32 * Math.cos((center.lat * Math.PI) / 180))
-  const stepSizeKm = radiusKm / steps
-
-  for (let i = -steps; i <= steps; i++) {
-    for (let j = -steps; j <= steps; j++) {
-      candidates.push({
-        lat: center.lat + i * stepSizeKm * latPerKm,
-        lng: center.lng + j * stepSizeKm * lngPerKm,
-      })
-    }
-  }
-
-  return candidates
 }
 
 /**

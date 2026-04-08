@@ -5,7 +5,6 @@ import { RESULT_MAP_ZOOM } from '../../constants'
 
 interface Props {
   place: PlaceResult
-  midpointLabel?: string
 }
 
 function PriceLevel({ level }: { level: number }) {
@@ -25,26 +24,16 @@ function Stars({ rating }: { rating: number }) {
   )
 }
 
-export function PlaceCard({ place, midpointLabel }: Props) {
-  const { selectedPlaceId, setSelectedPlaceId, mapRef, searchState } =
-    useAppStore()
-
+export function PlaceCard({ place }: Props) {
+  const { selectedPlaceId, setSelectedPlaceId, mapRef, searchState } = useAppStore()
   const isSelected = selectedPlaceId === place.placeId
-
-  const midpoint =
-    midpointLabel === 'drive'
-      ? searchState.driveTimeMidpoint
-      : searchState.geographicMidpoint
-
-  const distMeters = midpoint
-    ? haversineDistance(midpoint, place.location)
-    : null
+  const midpoint = searchState.geographicMidpoint
+  const distMeters = midpoint ? haversineDistance(midpoint, place.location) : null
 
   const handleClick = () => {
     setSelectedPlaceId(isSelected ? null : place.placeId)
     if (mapRef) {
-      mapRef.panTo(place.location)
-      mapRef.setZoom(RESULT_MAP_ZOOM)
+      mapRef.flyTo({ center: [place.location.lng, place.location.lat], zoom: RESULT_MAP_ZOOM, duration: 600 })
     }
   }
 

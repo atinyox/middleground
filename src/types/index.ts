@@ -28,9 +28,7 @@ export interface SearchState {
   status: SearchStatus
   error?: string
   geographicMidpoint?: LatLng
-  driveTimeMidpoint?: LatLng
   places: PlaceResult[]
-  driveTimePlaces: PlaceResult[]
   searchRadius: number
   usedFallback: boolean
   fallbackType?: 'radius' | 'shopping_mall'

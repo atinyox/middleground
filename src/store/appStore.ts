@@ -19,10 +19,6 @@ interface AppStore {
   setSearchState: (update: Partial<SearchState>) => void
   resetSearch: () => void
 
-  // Drive time toggle
-  driveTimeEnabled: boolean
-  setDriveTimeEnabled: (enabled: boolean) => void
-
   // Map interaction
   selectedPlaceId: string | null
   setSelectedPlaceId: (id: string | null) => void
@@ -35,7 +31,6 @@ interface AppStore {
 const initialSearchState: SearchState = {
   status: 'idle',
   places: [],
-  driveTimePlaces: [],
   searchRadius: 5000,
   usedFallback: false,
 }
@@ -75,9 +70,6 @@ export const useAppStore = create<AppStore>((set) => ({
   setSearchState: (update) =>
     set((s) => ({ searchState: { ...s.searchState, ...update } })),
   resetSearch: () => set({ searchState: initialSearchState }),
-
-  driveTimeEnabled: false,
-  setDriveTimeEnabled: (enabled) => set({ driveTimeEnabled: enabled }),
 
   selectedPlaceId: null,
   setSelectedPlaceId: (id) => set({ selectedPlaceId: id }),

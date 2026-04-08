@@ -5,13 +5,12 @@ import { useAppStore } from '../../store/appStore'
 import { DEFAULT_MAP_CENTER, DEFAULT_MAP_ZOOM } from '../../constants'
 import { AddressMarker } from './AddressMarker'
 import { MidpointMarker } from './MidpointMarker'
-import { DriveTimeMarker } from './DriveTimeMarker'
 import { PlaceMarker } from './PlaceMarker'
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
 
 export function MapView() {
-  const { addresses, searchState, driveTimeEnabled, setMapRef } = useAppStore()
+  const { addresses, searchState, setMapRef } = useAppStore()
   const mapRef = useRef<MapRef>(null)
 
   const onLoad = useCallback(() => {
@@ -35,10 +34,6 @@ export function MapView() {
     if (searchState.geographicMidpoint) {
       lngs.push(searchState.geographicMidpoint.lng)
       lats.push(searchState.geographicMidpoint.lat)
-    }
-    if (searchState.driveTimeMidpoint) {
-      lngs.push(searchState.driveTimeMidpoint.lng)
-      lats.push(searchState.driveTimeMidpoint.lat)
     }
     for (const p of searchState.places) {
       lngs.push(p.location.lng)
@@ -78,23 +73,14 @@ export function MapView() {
       {searchState.geographicMidpoint && (
         <MidpointMarker
           position={searchState.geographicMidpoint}
-          label="Geographic midpoint"
+          label="Midpoint"
           color="#8B5CF6"
         />
-      )}
-
-      {driveTimeEnabled && searchState.driveTimeMidpoint && (
-        <DriveTimeMarker position={searchState.driveTimeMidpoint} />
       )}
 
       {searchState.places.map((p) => (
         <PlaceMarker key={p.placeId} place={p} />
       ))}
-
-      {driveTimeEnabled &&
-        searchState.driveTimePlaces.map((p) => (
-          <PlaceMarker key={`dt-${p.placeId}`} place={p} isDriveTime />
-        ))}
     </Map>
   )
 }

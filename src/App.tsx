@@ -4,7 +4,6 @@ import { AddressPanel } from './components/AddressPanel/AddressPanel'
 import { MapView } from './components/MapView/MapView'
 import { ResultsPanel } from './components/ResultsPanel/ResultsPanel'
 import { SearchButton } from './components/Controls/SearchButton'
-import { DriveTimeToggle } from './components/Controls/DriveTimeToggle'
 import { ErrorBanner } from './components/common/ErrorBanner'
 
 const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN
@@ -33,8 +32,7 @@ function AppInner() {
           <AddressPanel />
         </div>
 
-        <div className="px-4 pb-4 space-y-3 border-b border-gray-100">
-          <DriveTimeToggle />
+        <div className="px-4 pb-4 border-b border-gray-100">
           <SearchButton />
         </div>
 

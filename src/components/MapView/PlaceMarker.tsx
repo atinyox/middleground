@@ -4,13 +4,11 @@ import type { PlaceResult } from '../../types'
 
 interface Props {
   place: PlaceResult
-  isDriveTime?: boolean
 }
 
-export function PlaceMarker({ place, isDriveTime = false }: Props) {
+export function PlaceMarker({ place }: Props) {
   const { selectedPlaceId, setSelectedPlaceId } = useAppStore()
   const isSelected = selectedPlaceId === place.placeId
-  const color = isDriveTime ? '#F59E0B' : '#EF4444'
 
   return (
     <>
@@ -23,8 +21,7 @@ export function PlaceMarker({ place, isDriveTime = false }: Props) {
           onClick={() => setSelectedPlaceId(isSelected ? null : place.placeId)}
           title={place.name}
           aria-label={place.name}
-          className="hover:scale-125 transition-transform"
-          style={{ color }}
+          className="hover:scale-125 transition-transform text-red-500"
         >
           <svg width="20" height="28" viewBox="0 0 20 28" fill="currentColor">
             <path d="M10 0C4.48 0 0 4.48 0 10c0 7.5 10 18 10 18s10-10.5 10-18c0-5.52-4.48-10-10-10z" />
