@@ -24,6 +24,16 @@ export function MapView() {
     [setMapRef]
   )
 
+  // On initial load: if addresses were pre-populated from a shared URL, zoom to fit them
+  useEffect(() => {
+    if (!mapRef || searchState.status !== 'idle') return
+    const geocoded = addresses.filter((a) => a.geocoded).map((a) => a.geocoded!)
+    if (geocoded.length === 0) return
+    const bounds = new google.maps.LatLngBounds()
+    geocoded.forEach((loc) => bounds.extend(loc))
+    mapRef.fitBounds(bounds, 80)
+  }, [mapRef, addresses, searchState.status])
+
   // Fit bounds to all visible points whenever results arrive or change
   useEffect(() => {
     if (!mapRef || searchState.status !== 'done') return
