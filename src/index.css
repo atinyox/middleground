@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Prevent Google Maps autocomplete dropdown from being clipped */
+.pac-container {
+  z-index: 9999;
+}
