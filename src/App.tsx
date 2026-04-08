@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useLoadScript } from '@react-google-maps/api'
 import { useAppStore } from './store/appStore'
 import { ApiKeyGate } from './components/common/ApiKeyGate'
@@ -9,6 +9,7 @@ import { SearchButton } from './components/Controls/SearchButton'
 import { ShareButton } from './components/Controls/ShareButton'
 import { ErrorBanner } from './components/common/ErrorBanner'
 import { useHydrateFromUrl } from './hooks/useShareUrl'
+import { useMidpointSearch } from './hooks/useMidpointSearch'
 
 const LIBRARIES: ('places')[] = ['places']
 const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY
@@ -25,8 +26,17 @@ function AppInner() {
   })
 
   const searchState = useAppStore((s) => s.searchState)
+  const mapRef = useAppStore((s) => s.mapRef)
   const [sidebarOpen, setSidebarOpen] = useState(false)
-  useHydrateFromUrl()
+  const didHydrate = useHydrateFromUrl()
+  const { runSearch } = useMidpointSearch()
+
+  // Auto-run search once the map is ready if the page was opened via a shared URL
+  useEffect(() => {
+    if (didHydrate.current && mapRef) {
+      runSearch()
+    }
+  }, [mapRef]) // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loadError) {
     return (

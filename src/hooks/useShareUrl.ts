@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useAppStore } from '../store/appStore'
 import type { AddressEntry } from '../types'
 
@@ -24,10 +24,12 @@ export function buildShareUrl(addresses: AddressEntry[]): string {
 
 /**
  * On mount, reads `a` params from the URL, hydrates the store, then cleans the URL.
- * Must be called inside a component that has access to the Zustand store.
+ * Returns a ref that is `true` when hydration occurred — callers can use this
+ * to trigger follow-up effects (e.g. auto-running the search).
  */
-export function useHydrateFromUrl(): void {
+export function useHydrateFromUrl(): React.MutableRefObject<boolean> {
   const hydrateAddresses = useAppStore((s) => s.hydrateAddresses)
+  const didHydrate = useRef(false)
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -47,6 +49,9 @@ export function useHydrateFromUrl(): void {
     if (parsed.length === 0) return
 
     hydrateAddresses(parsed)
+    didHydrate.current = true
     window.history.replaceState({}, '', window.location.pathname)
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  return didHydrate
 }
