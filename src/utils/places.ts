@@ -51,17 +51,21 @@ function nearbySearch(
 }
 
 /**
- * Search for restaurants near the midpoint using Google Places Nearby Search,
- * expanding radius if needed, falling back to shopping malls.
+ * Search for restaurants (or boba shops) near the midpoint using Google Places
+ * Nearby Search, expanding radius if needed, falling back to shopping malls.
  */
 export async function searchWithFallback(
   service: google.maps.places.PlacesService,
-  midpoint: LatLng
+  midpoint: LatLng,
+  bobaMode = false
 ): Promise<FallbackResult> {
   const location = new google.maps.LatLng(midpoint.lat, midpoint.lng)
+  const baseRequest = bobaMode
+    ? { keyword: 'boba tea' }
+    : { type: 'restaurant' as const }
 
   for (const radius of RADIUS_STEPS) {
-    const raw = await nearbySearch(service, { location, radius, type: 'restaurant' })
+    const raw = await nearbySearch(service, { location, radius, ...baseRequest })
 
     if (raw.length > 0) {
       const places = raw.map(mapPlaceResult).filter(Boolean) as PlaceResult[]
@@ -74,7 +78,7 @@ export async function searchWithFallback(
     }
   }
 
-  // All restaurant radii exhausted — try shopping malls
+  // All radii exhausted — try shopping malls as last resort
   const raw = await nearbySearch(service, {
     location,
     radius: RADIUS_STEPS[RADIUS_STEPS.length - 1],

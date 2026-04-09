@@ -15,8 +15,9 @@ export function useMidpointSearch() {
   }, [mapRef])
 
   const runSearch = useCallback(async () => {
-    // Read addresses fresh from store so stale closures don't cause missed updates
-    const geocoded = useAppStore.getState().addresses
+    // Read fresh from store so stale closures don't cause missed updates
+    const { addresses, bobaMode } = useAppStore.getState()
+    const geocoded = addresses
       .filter((a) => a.geocoded !== null)
       .map((a) => a.geocoded!)
 
@@ -38,7 +39,7 @@ export function useMidpointSearch() {
     setSearchState({ status: 'searching', geographicMidpoint: midpoint })
 
     try {
-      const result = await searchWithFallback(service, midpoint)
+      const result = await searchWithFallback(service, midpoint, bobaMode)
       setSearchState({
         status: 'done',
         places: result.places,

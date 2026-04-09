@@ -27,6 +27,8 @@ function AppInner() {
 
   const searchState = useAppStore((s) => s.searchState)
   const mapRef = useAppStore((s) => s.mapRef)
+  const bobaMode = useAppStore((s) => s.bobaMode)
+  const toggleBobaMode = useAppStore((s) => s.toggleBobaMode)
   const [sidebarOpen, setSidebarOpen] = useState(false)
   const didHydrate = useHydrateFromUrl()
   const { runSearch } = useMidpointSearch()
@@ -74,7 +76,19 @@ function AppInner() {
               a locationally weighted average
             </p>
           </div>
-          {/* Close button — mobile only */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                toggleBobaMode()
+                const { addresses } = useAppStore.getState()
+                if (addresses.filter((a) => a.geocoded).length >= 2) runSearch()
+              }}
+              title={bobaMode ? 'Switch back to restaurants' : 'Boba mode'}
+              className="text-xl leading-none opacity-60 hover:opacity-100 transition-opacity select-none"
+            >
+              {bobaMode ? '🍽️' : '🧋'}
+            </button>
+            {/* Close button — mobile only */}
           <button
             className="md:hidden ml-2 p-1 text-gray-400 hover:text-gray-600 transition-colors"
             onClick={() => setSidebarOpen(false)}
@@ -84,6 +98,7 @@ function AppInner() {
               <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
             </svg>
           </button>
+          </div>
         </div>
 
         <div className="pt-4 pb-3">

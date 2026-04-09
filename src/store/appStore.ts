@@ -30,6 +30,10 @@ interface AppStore {
   // Drag-to-place pin state
   draggingPinId: string | null
   setDraggingPinId: (id: string | null) => void
+
+  // Secret boba mode
+  bobaMode: boolean
+  toggleBobaMode: () => void
 }
 
 const initialSearchState: SearchState = {
@@ -98,6 +102,9 @@ export const useAppStore = create<AppStore>((set) => ({
 
   draggingPinId: null,
   setDraggingPinId: (id) => set({ draggingPinId: id }),
+
+  bobaMode: false,
+  toggleBobaMode: () => set((s) => ({ bobaMode: !s.bobaMode })),
 }))
 
 // Selectors
