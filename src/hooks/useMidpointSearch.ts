@@ -4,7 +4,7 @@ import { computeGeographicMidpoint } from '../utils/geo'
 import { searchWithFallback } from '../utils/places'
 
 export function useMidpointSearch() {
-  const { addresses, setSearchState, mapRef } = useAppStore()
+  const { setSearchState, mapRef } = useAppStore()
   const serviceRef = useRef<google.maps.places.PlacesService | null>(null)
 
   const getService = useCallback(() => {
@@ -15,7 +15,8 @@ export function useMidpointSearch() {
   }, [mapRef])
 
   const runSearch = useCallback(async () => {
-    const geocoded = addresses
+    // Read addresses fresh from store so stale closures don't cause missed updates
+    const geocoded = useAppStore.getState().addresses
       .filter((a) => a.geocoded !== null)
       .map((a) => a.geocoded!)
 
@@ -51,7 +52,7 @@ export function useMidpointSearch() {
         error: err instanceof Error ? err.message : 'Search failed.',
       })
     }
-  }, [addresses, getService, setSearchState])
+  }, [getService, setSearchState])
 
   return { runSearch }
 }

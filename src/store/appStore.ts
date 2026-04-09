@@ -26,6 +26,10 @@ interface AppStore {
   // Map instance (for panTo, fitBounds)
   mapRef: google.maps.Map | null
   setMapRef: (map: google.maps.Map) => void
+
+  // Drag-to-place pin state
+  draggingPinId: string | null
+  setDraggingPinId: (id: string | null) => void
 }
 
 const initialSearchState: SearchState = {
@@ -91,6 +95,9 @@ export const useAppStore = create<AppStore>((set) => ({
 
   mapRef: null,
   setMapRef: (map) => set({ mapRef: map }),
+
+  draggingPinId: null,
+  setDraggingPinId: (id) => set({ draggingPinId: id }),
 }))
 
 // Selectors

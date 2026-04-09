@@ -1,6 +1,12 @@
 import type { LatLng, PlaceResult } from '../types'
 import { RADIUS_STEPS } from '../constants'
 
+export async function reverseGeocode(latLng: LatLng): Promise<string> {
+  const geocoder = new google.maps.Geocoder()
+  const { results } = await geocoder.geocode({ location: latLng })
+  return results[0]?.formatted_address ?? `${latLng.lat.toFixed(5)}, ${latLng.lng.toFixed(5)}`
+}
+
 export interface FallbackResult {
   places: PlaceResult[]
   searchRadius: number

@@ -51,6 +51,21 @@ export function haversineDistance(a: LatLng, b: LatLng): number {
 }
 
 /**
+ * Convert a pixel offset within a map container to a LatLng.
+ * Uses the map's Mercator projection for accuracy at any zoom level.
+ */
+export function pixelToLatLng(map: google.maps.Map, offsetX: number, offsetY: number): LatLng {
+  const projection = map.getProjection()!
+  const scale = Math.pow(2, map.getZoom()!)
+  const div = map.getDiv()
+  const centerWorld = projection.fromLatLngToPoint(map.getCenter()!)!
+  const worldX = centerWorld.x + (offsetX - div.offsetWidth / 2) / scale
+  const worldY = centerWorld.y + (offsetY - div.offsetHeight / 2) / scale
+  const result = projection.fromPointToLatLng(new google.maps.Point(worldX, worldY))!
+  return { lat: result.lat(), lng: result.lng() }
+}
+
+/**
  * Format a distance in meters to a human-readable string.
  */
 export function formatDistance(meters: number): string {

@@ -9,7 +9,7 @@ interface Props {
 }
 
 export function AddressInput({ entry, index, isLoaded }: Props) {
-  const { updateAddress, removeAddress } = useAppStore()
+  const { updateAddress, removeAddress, setDraggingPinId } = useAppStore()
   const canRemove = useAppStore(selectCanRemove)
   const inputRef = useRef<HTMLInputElement>(null)
   const autocompleteRef = useRef<google.maps.places.Autocomplete | null>(null)
@@ -48,7 +48,21 @@ export function AddressInput({ entry, index, isLoaded }: Props) {
 
   return (
     <div className="flex items-center gap-2">
-      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center">
+      <span
+        className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-500 text-white text-xs font-bold flex items-center justify-center cursor-grab active:cursor-grabbing select-none"
+        draggable
+        title="Drag onto map to place pin"
+        onDragStart={(e) => {
+          const ghost = document.createElement('canvas')
+          ghost.width = 1
+          ghost.height = 1
+          e.dataTransfer.setDragImage(ghost, 0, 0)
+          e.dataTransfer.setData('addressId', entry.id)
+          e.dataTransfer.effectAllowed = 'move'
+          setDraggingPinId(entry.id)
+        }}
+        onDragEnd={() => setDraggingPinId(null)}
+      >
         {index + 1}
       </span>
       <div className="relative flex-1">
