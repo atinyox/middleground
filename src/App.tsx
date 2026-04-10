@@ -49,7 +49,7 @@ function AppInner() {
   }
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
+    <div className="flex h-full overflow-hidden bg-gray-50">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div

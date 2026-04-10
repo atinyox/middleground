@@ -2,6 +2,22 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Lock the viewport on iOS Safari — prevents the map from being scrolled
+   out from under the floating menu button */
+html,
+body {
+  height: 100%;
+  overflow: hidden;
+  overscroll-behavior: none;
+  /* Use dynamic viewport height so the layout fills the space correctly
+     when the iOS toolbar shows/hides */
+  height: 100dvh;
+}
+
+#root {
+  height: 100%;
+}
+
 /* Prevent Google Maps autocomplete dropdown from being clipped */
 .pac-container {
   z-index: 9999;
